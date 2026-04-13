@@ -123,7 +123,9 @@ func (h *WebSocketHandler) handleResign(userID, gameID string) []byte {
 		return nil
 	}
 
-	resp := map[string]any{wsmsg.KeyType: wsmsg.TypeGameResigned, wsmsg.KeyGameID: gameID, "game": dto.ToGameResponse(context.Background(), h.handler.userLookup, g, h.handler.gameService.GetPendingDrawOffer(context.Background(), gameID))}
+	drawOffer := h.handler.gameService.GetPendingDrawOffer(context.Background(), gameID)
+	resp := wsmsg.NewGameMessage(wsmsg.TypeGameResigned, gameID,
+		dto.ToGameResponse(context.Background(), h.handler.userLookup, g, drawOffer))
 	b, _ := json.Marshal(resp)
 	return b
 }
@@ -138,7 +140,9 @@ func (h *WebSocketHandler) handleOfferDraw(userID, gameID string) []byte {
 		return nil
 	}
 
-	resp := map[string]any{wsmsg.KeyType: wsmsg.TypeDrawOffered, wsmsg.KeyGameID: gameID, "game": dto.ToGameResponse(context.Background(), h.handler.userLookup, g, h.handler.gameService.GetPendingDrawOffer(context.Background(), gameID))}
+	drawOffer := h.handler.gameService.GetPendingDrawOffer(context.Background(), gameID)
+	resp := wsmsg.NewGameMessage(wsmsg.TypeDrawOffered, gameID,
+		dto.ToGameResponse(context.Background(), h.handler.userLookup, g, drawOffer))
 	b, _ := json.Marshal(resp)
 	return b
 }
@@ -152,7 +156,9 @@ func (h *WebSocketHandler) handleAcceptDraw(userID, gameID string) []byte {
 	if err != nil {
 		return nil
 	}
-	resp := map[string]any{wsmsg.KeyType: wsmsg.TypeDrawAccepted, wsmsg.KeyGameID: gameID, "game": dto.ToGameResponse(context.Background(), h.handler.userLookup, g, h.handler.gameService.GetPendingDrawOffer(context.Background(), gameID))}
+	drawOffer := h.handler.gameService.GetPendingDrawOffer(context.Background(), gameID)
+	resp := wsmsg.NewGameMessage(wsmsg.TypeDrawAccepted, gameID,
+		dto.ToGameResponse(context.Background(), h.handler.userLookup, g, drawOffer))
 	b, _ := json.Marshal(resp)
 	return b
 }
@@ -166,7 +172,9 @@ func (h *WebSocketHandler) handleDeclineDraw(userID, gameID string) []byte {
 	if err != nil {
 		return nil
 	}
-	resp := map[string]any{wsmsg.KeyType: wsmsg.TypeDrawDeclined, wsmsg.KeyGameID: gameID, "game": dto.ToGameResponse(context.Background(), h.handler.userLookup, g, h.handler.gameService.GetPendingDrawOffer(context.Background(), gameID))}
+	drawOffer := h.handler.gameService.GetPendingDrawOffer(context.Background(), gameID)
+	resp := wsmsg.NewGameMessage(wsmsg.TypeDrawDeclined, gameID,
+		dto.ToGameResponse(context.Background(), h.handler.userLookup, g, drawOffer))
 	b, _ := json.Marshal(resp)
 	return b
 }

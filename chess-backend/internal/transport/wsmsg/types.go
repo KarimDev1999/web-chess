@@ -1,6 +1,10 @@
 package wsmsg
 
-import "time"
+import (
+	"time"
+
+	"chess-backend/internal/transport/dto"
+)
 
 const (
 	TypeGameCreated      = "game.created"
@@ -39,8 +43,22 @@ type Message struct {
 	Timestamp time.Time `json:"timestamp,omitempty"`
 }
 
+type GameMessage struct {
+	Message
+	GameID string           `json:"game_id"`
+	Game   dto.GameResponse `json:"game"`
+}
+
+func NewGameMessage(msgType, gameID string, game dto.GameResponse) GameMessage {
+	return GameMessage{
+		Message: Message{Type: msgType, Timestamp: time.Now()},
+		GameID:  gameID,
+		Game:    game,
+	}
+}
+
 type ClientMessage struct {
-	Type string         `json:"type"`
+	Message
 	Data map[string]any `json:"data,omitempty"`
 }
 
