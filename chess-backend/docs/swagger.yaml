@@ -1,61 +1,93 @@
 basePath: /api
 definitions:
-  chess-backend_internal_transport_dto.AuthResponse:
+  dto.AuthResponse:
     properties:
       token:
         type: string
       user:
-        $ref: '#/definitions/chess-backend_internal_transport_dto.UserDTO'
+        $ref: '#/definitions/dto.UserDTO'
     type: object
-  chess-backend_internal_transport_dto.GameResponse:
+  dto.DrawOfferResponse:
     properties:
-      black_player_id:
+      offered_at:
         type: string
+      offered_by:
+        type: string
+    type: object
+  dto.GameResponse:
+    properties:
+      black_player:
+        $ref: '#/definitions/dto.PlayerInfo'
+      black_remaining:
+        type: integer
       created_at:
+        type: string
+      draw_offer:
+        $ref: '#/definitions/dto.DrawOfferResponse'
+      end_reason:
         type: string
       fen:
         type: string
       id:
         type: string
+      last_move_at:
+        type: string
       moves:
         items:
-          $ref: '#/definitions/chess-backend_internal_transport_dto.MoveResponse'
+          $ref: '#/definitions/dto.MoveResponse'
         type: array
+      result:
+        type: string
       status:
         type: string
+      time_control:
+        $ref: '#/definitions/dto.TimeControlResponse'
       turn:
         type: string
       updated_at:
         type: string
-      white_player_id:
-        type: string
+      white_player:
+        $ref: '#/definitions/dto.PlayerInfo'
+      white_remaining:
+        type: integer
     type: object
-  chess-backend_internal_transport_dto.LoginRequest:
+  dto.LoginRequest:
     properties:
       email:
         type: string
       password:
         type: string
     type: object
-  chess-backend_internal_transport_dto.MoveRequest:
+  dto.MoveRequest:
     properties:
       from:
         type: string
       to:
         type: string
     type: object
-  chess-backend_internal_transport_dto.MoveResponse:
+  dto.MoveResponse:
     properties:
+      castle:
+        type: boolean
+      en_passant:
+        type: boolean
       from:
-        description: algebraic, e.g. "e2"
         type: string
       made_at:
         type: string
+      promotion:
+        type: string
       to:
-        description: algebraic, e.g. "e4"
         type: string
     type: object
-  chess-backend_internal_transport_dto.RegisterRequest:
+  dto.PlayerInfo:
+    properties:
+      id:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.RegisterRequest:
     properties:
       email:
         type: string
@@ -64,7 +96,23 @@ definitions:
       username:
         type: string
     type: object
-  chess-backend_internal_transport_dto.UserDTO:
+  dto.TimeControlPresetResponse:
+    properties:
+      base:
+        type: integer
+      increment:
+        type: integer
+      label:
+        type: string
+    type: object
+  dto.TimeControlResponse:
+    properties:
+      base:
+        type: integer
+      increment:
+        type: integer
+    type: object
+  dto.UserDTO:
     properties:
       email:
         type: string
@@ -97,7 +145,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+              $ref: '#/definitions/dto.GameResponse'
             type: array
         "401":
           description: Unauthorized
@@ -122,7 +170,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+            $ref: '#/definitions/dto.GameResponse'
         "401":
           description: Unauthorized
           schema:
@@ -151,7 +199,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+            $ref: '#/definitions/dto.GameResponse'
         "401":
           description: Unauthorized
           schema:
@@ -163,6 +211,111 @@ paths:
       security:
       - BearerAuth: []
       summary: Get a game by ID
+      tags:
+      - game
+  /games/{id}/draw/accept:
+    post:
+      consumes:
+      - application/json
+      description: Accept the opponent's draw offer
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GameResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Game not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Accept a draw offer
+      tags:
+      - game
+  /games/{id}/draw/decline:
+    post:
+      consumes:
+      - application/json
+      description: Decline the opponent's draw offer
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GameResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Game not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Decline a draw offer
+      tags:
+      - game
+  /games/{id}/draw/offer:
+    post:
+      consumes:
+      - application/json
+      description: Offer a draw to your opponent
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GameResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Game not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Offer a draw
       tags:
       - game
   /games/{id}/join:
@@ -182,7 +335,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+            $ref: '#/definitions/dto.GameResponse'
         "400":
           description: Bad request
           schema:
@@ -216,14 +369,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/chess-backend_internal_transport_dto.MoveRequest'
+          $ref: '#/definitions/dto.MoveRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+            $ref: '#/definitions/dto.GameResponse'
         "400":
           description: Invalid move
           schema:
@@ -257,7 +410,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/chess-backend_internal_transport_dto.MoveResponse'
+              $ref: '#/definitions/dto.MoveResponse'
             type: array
         "401":
           description: Unauthorized
@@ -272,6 +425,41 @@ paths:
       summary: Get move history for a game
       tags:
       - game
+  /games/{id}/resign:
+    post:
+      consumes:
+      - application/json
+      description: Resign and concede the game to your opponent
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GameResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Game not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Resign from a game
+      tags:
+      - game
   /games/waiting:
     get:
       description: Get all games waiting for a player
@@ -282,7 +470,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+              $ref: '#/definitions/dto.GameResponse'
             type: array
         "401":
           description: Unauthorized
@@ -308,14 +496,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/chess-backend_internal_transport_dto.LoginRequest'
+          $ref: '#/definitions/dto.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/chess-backend_internal_transport_dto.AuthResponse'
+            $ref: '#/definitions/dto.AuthResponse'
         "400":
           description: Invalid request
           schema:
@@ -338,14 +526,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/chess-backend_internal_transport_dto.RegisterRequest'
+          $ref: '#/definitions/dto.RegisterRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/chess-backend_internal_transport_dto.AuthResponse'
+            $ref: '#/definitions/dto.AuthResponse'
         "400":
           description: Invalid request
           schema:
@@ -361,6 +549,23 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /time-controls:
+    get:
+      description: Return the list of standard time control presets
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/dto.TimeControlPresetResponse'
+              type: array
+            type: object
+      summary: Get available time control presets
+      tags:
+      - game
 schemes:
 - http
 securityDefinitions:

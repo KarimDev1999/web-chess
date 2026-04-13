@@ -436,7 +436,6 @@ export function GameView() {
           {game.status === GameStatus.Waiting && !game.black_player && (
             <div className="waiting-notice">
               <p>Waiting for opponent to join...</p>
-              <p className="hint">Share the game link or wait from another account.</p>
             </div>
           )}
 

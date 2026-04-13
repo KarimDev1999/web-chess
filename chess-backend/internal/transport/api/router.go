@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chimdlw "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
@@ -29,6 +30,14 @@ func NewRouter(
 	r.Group(func(r chi.Router) {
 		r.Use(chimdlw.Logger)
 		r.Use(chimdlw.Recoverer)
+		r.Use(cors.Handler(cors.Options{
+			AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173"},
+			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: true,
+			MaxAge:           300,
+		}))
 
 		r.Post(appconst.RouteRegister, authHandler.Register)
 		r.Post(appconst.RouteLogin, authHandler.Login)

@@ -45,7 +45,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/chess-backend_internal_transport_dto.GameResponse"
+                                "$ref": "#/definitions/dto.GameResponse"
                             }
                         }
                     },
@@ -84,7 +84,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/chess-backend_internal_transport_dto.GameResponse"
+                            "$ref": "#/definitions/dto.GameResponse"
                         }
                     },
                     "401": {
@@ -123,7 +123,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/chess-backend_internal_transport_dto.GameResponse"
+                                "$ref": "#/definitions/dto.GameResponse"
                             }
                         }
                     },
@@ -170,7 +170,172 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/chess-backend_internal_transport_dto.GameResponse"
+                            "$ref": "#/definitions/dto.GameResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Game not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/games/{id}/draw/accept": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Accept the opponent's draw offer",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "game"
+                ],
+                "summary": "Accept a draw offer",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Game ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GameResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Game not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/games/{id}/draw/decline": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Decline the opponent's draw offer",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "game"
+                ],
+                "summary": "Decline a draw offer",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Game ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GameResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Game not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/games/{id}/draw/offer": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Offer a draw to your opponent",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "game"
+                ],
+                "summary": "Offer a draw",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Game ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GameResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "401": {
@@ -219,7 +384,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/chess-backend_internal_transport_dto.GameResponse"
+                            "$ref": "#/definitions/dto.GameResponse"
                         }
                     },
                     "400": {
@@ -275,7 +440,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/chess-backend_internal_transport_dto.MoveRequest"
+                            "$ref": "#/definitions/dto.MoveRequest"
                         }
                     }
                 ],
@@ -283,7 +448,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/chess-backend_internal_transport_dto.GameResponse"
+                            "$ref": "#/definitions/dto.GameResponse"
                         }
                     },
                     "400": {
@@ -337,8 +502,63 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/chess-backend_internal_transport_dto.MoveResponse"
+                                "$ref": "#/definitions/dto.MoveResponse"
                             }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Game not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/games/{id}/resign": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Resign and concede the game to your opponent",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "game"
+                ],
+                "summary": "Resign from a game",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Game ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GameResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "401": {
@@ -376,7 +596,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/chess-backend_internal_transport_dto.LoginRequest"
+                            "$ref": "#/definitions/dto.LoginRequest"
                         }
                     }
                 ],
@@ -384,7 +604,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/chess-backend_internal_transport_dto.AuthResponse"
+                            "$ref": "#/definitions/dto.AuthResponse"
                         }
                     },
                     "400": {
@@ -422,7 +642,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/chess-backend_internal_transport_dto.RegisterRequest"
+                            "$ref": "#/definitions/dto.RegisterRequest"
                         }
                     }
                 ],
@@ -430,7 +650,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/chess-backend_internal_transport_dto.AuthResponse"
+                            "$ref": "#/definitions/dto.AuthResponse"
                         }
                     },
                     "400": {
@@ -453,27 +673,73 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/time-controls": {
+            "get": {
+                "description": "Return the list of standard time control presets",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "game"
+                ],
+                "summary": "Get available time control presets",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/dto.TimeControlPresetResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "chess-backend_internal_transport_dto.AuthResponse": {
+        "dto.AuthResponse": {
             "type": "object",
             "properties": {
                 "token": {
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/chess-backend_internal_transport_dto.UserDTO"
+                    "$ref": "#/definitions/dto.UserDTO"
                 }
             }
         },
-        "chess-backend_internal_transport_dto.GameResponse": {
+        "dto.DrawOfferResponse": {
             "type": "object",
             "properties": {
-                "black_player_id": {
+                "offered_at": {
                     "type": "string"
                 },
+                "offered_by": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GameResponse": {
+            "type": "object",
+            "properties": {
+                "black_player": {
+                    "$ref": "#/definitions/dto.PlayerInfo"
+                },
+                "black_remaining": {
+                    "type": "integer"
+                },
                 "created_at": {
+                    "type": "string"
+                },
+                "draw_offer": {
+                    "$ref": "#/definitions/dto.DrawOfferResponse"
+                },
+                "end_reason": {
                     "type": "string"
                 },
                 "fen": {
@@ -482,14 +748,23 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "last_move_at": {
+                    "type": "string"
+                },
                 "moves": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/chess-backend_internal_transport_dto.MoveResponse"
+                        "$ref": "#/definitions/dto.MoveResponse"
                     }
+                },
+                "result": {
+                    "type": "string"
                 },
                 "status": {
                     "type": "string"
+                },
+                "time_control": {
+                    "$ref": "#/definitions/dto.TimeControlResponse"
                 },
                 "turn": {
                     "type": "string"
@@ -497,12 +772,15 @@ const docTemplate = `{
                 "updated_at": {
                     "type": "string"
                 },
-                "white_player_id": {
-                    "type": "string"
+                "white_player": {
+                    "$ref": "#/definitions/dto.PlayerInfo"
+                },
+                "white_remaining": {
+                    "type": "integer"
                 }
             }
         },
-        "chess-backend_internal_transport_dto.LoginRequest": {
+        "dto.LoginRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -513,7 +791,7 @@ const docTemplate = `{
                 }
             }
         },
-        "chess-backend_internal_transport_dto.MoveRequest": {
+        "dto.MoveRequest": {
             "type": "object",
             "properties": {
                 "from": {
@@ -524,23 +802,41 @@ const docTemplate = `{
                 }
             }
         },
-        "chess-backend_internal_transport_dto.MoveResponse": {
+        "dto.MoveResponse": {
             "type": "object",
             "properties": {
+                "castle": {
+                    "type": "boolean"
+                },
+                "en_passant": {
+                    "type": "boolean"
+                },
                 "from": {
-                    "description": "algebraic, e.g. \"e2\"",
                     "type": "string"
                 },
                 "made_at": {
                     "type": "string"
                 },
+                "promotion": {
+                    "type": "string"
+                },
                 "to": {
-                    "description": "algebraic, e.g. \"e4\"",
                     "type": "string"
                 }
             }
         },
-        "chess-backend_internal_transport_dto.RegisterRequest": {
+        "dto.PlayerInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RegisterRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -554,7 +850,32 @@ const docTemplate = `{
                 }
             }
         },
-        "chess-backend_internal_transport_dto.UserDTO": {
+        "dto.TimeControlPresetResponse": {
+            "type": "object",
+            "properties": {
+                "base": {
+                    "type": "integer"
+                },
+                "increment": {
+                    "type": "integer"
+                },
+                "label": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.TimeControlResponse": {
+            "type": "object",
+            "properties": {
+                "base": {
+                    "type": "integer"
+                },
+                "increment": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserDTO": {
             "type": "object",
             "properties": {
                 "email": {
