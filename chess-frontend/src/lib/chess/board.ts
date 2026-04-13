@@ -21,7 +21,6 @@ export interface Pos {
   col: number
 }
 
-/** Castling availability encoded as a string like "KQkq", "kq", "-", etc. */
 export type CastlingRights = string
 
 export interface FENMeta {
@@ -41,7 +40,6 @@ export function fromAlgebraic(s: string): Pos {
   return { row: BOARD_SIZE - parseInt(s[1], 10), col: s.charCodeAt(0) - 97 }
 }
 
-/** Parse the board placement part of a FEN string (just pieces). */
 export function parseFEN(fen: string): Board {
   const [placement] = fen.split(' ')
   const board: Board = []
@@ -62,7 +60,6 @@ export function parseFEN(fen: string): Board {
   return board
 }
 
-/** Parse castling rights and en-passant target from a full FEN string. */
 export function parseFENMeta(fen: string): FENMeta {
   const parts = fen.split(' ')
   const castling = parts.length >= 3 ? parts[2] : '-'
@@ -120,7 +117,6 @@ export function getPseudoLegalMoves(
         if (inBounds(tr, tc)) {
           const t = board[tr][tc]
           if (t && t.color === enemy) moves.push({ row: tr, col: tc })
-          // En-passant capture
           if (
             fenMeta?.enPassantTarget &&
             fenMeta.enPassantTarget.row === tr &&
@@ -146,7 +142,6 @@ export function getPseudoLegalMoves(
       break
     case PieceType.King: {
       for (const [dr, dc] of KING_DIRS) addIf(row + dr, col + dc)
-      // Castling moves
       if (fenMeta && fenMeta.castling !== '-') {
         const isWhite = piece.color === Color.White
         const homeRow = isWhite ? 7 : 0
@@ -167,7 +162,6 @@ export function getPseudoLegalMoves(
   return moves
 }
 
-/** Find the king position for the given color. */
 export function findKing(board: Board, color: Color): Pos | null {
   for (let r = 0; r < BOARD_SIZE; r++) {
     for (let c = 0; c < BOARD_SIZE; c++) {
@@ -180,11 +174,9 @@ export function findKing(board: Board, color: Color): Pos | null {
   return null
 }
 
-/** Check if the given position is attacked by any piece of the opponent color. */
 function isSquareAttackedBy(board: Board, row: number, col: number, byColor: Color): boolean {
   const enemy = byColor
 
-  // Knight attacks
   for (const [dr, dc] of KNIGHT_OFFSETS) {
     const r = row + dr,
       c = col + dc
@@ -194,7 +186,6 @@ function isSquareAttackedBy(board: Board, row: number, col: number, byColor: Col
     }
   }
 
-  // Pawn attacks
   const pawnDir = enemy === Color.White ? 1 : -1
   for (const dc of [-1, 1]) {
     const r = row + pawnDir,
@@ -205,7 +196,6 @@ function isSquareAttackedBy(board: Board, row: number, col: number, byColor: Col
     }
   }
 
-  // King attacks
   for (const [dr, dc] of KING_DIRS) {
     const r = row + dr,
       c = col + dc
@@ -215,7 +205,6 @@ function isSquareAttackedBy(board: Board, row: number, col: number, byColor: Col
     }
   }
 
-  // Sliding attacks (queen, rook, bishop)
   const trySlide = (dr: number, dc: number, types: PieceType[]): boolean => {
     for (let i = 1; i < BOARD_SIZE; i++) {
       const r = row + dr * i,
@@ -230,12 +219,10 @@ function isSquareAttackedBy(board: Board, row: number, col: number, byColor: Col
     return false
   }
 
-  // Orthogonal (rook/queen)
   for (const [dr, dc] of ORTHOGONAL_DIRS) {
     if (trySlide(dr, dc, [PieceType.Rook, PieceType.Queen])) return true
   }
 
-  // Diagonal (bishop/queen)
   for (const [dr, dc] of DIAGONAL_DIRS) {
     if (trySlide(dr, dc, [PieceType.Bishop, PieceType.Queen])) return true
   }
@@ -243,7 +230,6 @@ function isSquareAttackedBy(board: Board, row: number, col: number, byColor: Col
   return false
 }
 
-/** Return true if the player whose turn it is is currently in check. */
 export function isInCheck(board: Board, turn: Color): boolean {
   const king = findKing(board, turn)
   if (!king) return false

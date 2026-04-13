@@ -164,7 +164,6 @@ export function GameView() {
     if (!id) return
     setErrorMsg('')
     try {
-      // Making a move implicitly declines any pending draw offer
       if (hasOfferedDraw) {
         setHasOfferedDraw(false)
       }
@@ -232,7 +231,6 @@ export function GameView() {
     }
   }
 
-  // Auto-detect timeout — when live clock hits 0, call server to end the game
   useEffect(() => {
     if (!game || game.status !== 'active') {
       timeoutTriggered.current = false
@@ -240,7 +238,6 @@ export function GameView() {
     }
     if (!game.time_control || game.time_control.base === 0) return
     if (timeoutTriggered.current) return
-    // Inline the clock check to avoid reference issues
     const hasTimedOut = (color: Color) => {
       if (!game.time_control || game.time_control.base === 0) return false
       const stored = color === Color.White ? game.white_remaining : game.black_remaining
@@ -284,16 +281,12 @@ export function GameView() {
   const isPlayerInGame =
     game.white_player.id === currentUserId || game.black_player?.id === currentUserId
 
-  // ─── Live clock calculation ────────────────────────────────────────────────
   const getLiveRemaining = (color: Color): number | null => {
     if (!game.time_control || game.time_control.base === 0) return null
     const stored = color === Color.White ? game.white_remaining : game.black_remaining
     if (stored == null) return null
     if (!isGameActive) return stored
-    // Clock hasn't started yet — return full time
     if (!game.last_move_at) return stored
-    // Deduct elapsed time for the player whose turn it is
-    // clockTick forces a re-render every second so the live clock updates
     void clockTick
     if (color === game.turn) {
       const elapsed = Date.now() - new Date(game.last_move_at).getTime()
@@ -329,7 +322,6 @@ export function GameView() {
     const label = RESULT_LABELS[result]
     if (!endReason) return label
     if (endReason === GameEndReason.Timeout) {
-      // Show who ran out of time explicitly
       const loserColor = result === GameResult.WhiteWins ? 'Black' : 'White'
       return `${label} — ${loserColor} ran out of time`
     }
@@ -445,7 +437,6 @@ export function GameView() {
             </div>
           )}
 
-          {/* Inline draw offer from opponent (chess.com style — no modal) */}
           {opponentHasOffered && isGameActive && (
             <div className="draw-offer-inline">
               <p className="draw-offer-text">
@@ -465,7 +456,6 @@ export function GameView() {
             </div>
           )}
 
-          {/* Resign / Draw buttons */}
           {isGameActive && isPlayerInGame && (
             <div className="game-actions">
               {!userHasPendingOffer && (
