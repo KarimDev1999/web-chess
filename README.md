@@ -2,6 +2,9 @@
 
 A real-time multiplayer chess application with WebSocket support, built with Go and React.
 
+<img width="1161" height="946" alt="image" src="https://github.com/user-attachments/assets/52e31c94-6d3d-40aa-9a25-f4865064b944" />
+
+
 ## Features
 
 - Real-time two-player chess with WebSocket communication
