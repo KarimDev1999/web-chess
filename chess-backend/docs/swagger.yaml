@@ -1,0 +1,372 @@
+basePath: /api
+definitions:
+  chess-backend_internal_transport_dto.AuthResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/chess-backend_internal_transport_dto.UserDTO'
+    type: object
+  chess-backend_internal_transport_dto.GameResponse:
+    properties:
+      black_player_id:
+        type: string
+      created_at:
+        type: string
+      fen:
+        type: string
+      id:
+        type: string
+      moves:
+        items:
+          $ref: '#/definitions/chess-backend_internal_transport_dto.MoveResponse'
+        type: array
+      status:
+        type: string
+      turn:
+        type: string
+      updated_at:
+        type: string
+      white_player_id:
+        type: string
+    type: object
+  chess-backend_internal_transport_dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  chess-backend_internal_transport_dto.MoveRequest:
+    properties:
+      from:
+        type: string
+      to:
+        type: string
+    type: object
+  chess-backend_internal_transport_dto.MoveResponse:
+    properties:
+      from:
+        description: algebraic, e.g. "e2"
+        type: string
+      made_at:
+        type: string
+      to:
+        description: algebraic, e.g. "e4"
+        type: string
+    type: object
+  chess-backend_internal_transport_dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  chess-backend_internal_transport_dto.UserDTO:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://www.example.com/support
+  description: Real-time chess game backend with WebSocket.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Chess Backend API
+  version: "1.0"
+paths:
+  /games:
+    get:
+      description: Get all games the authenticated user participates in
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: List current user's games
+      tags:
+      - game
+    post:
+      consumes:
+      - application/json
+      description: Create a chess game as white player
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create a new game
+      tags:
+      - game
+  /games/{id}:
+    get:
+      description: Retrieve game details including board state and moves
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Game not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get a game by ID
+      tags:
+      - game
+  /games/{id}/join:
+    post:
+      consumes:
+      - application/json
+      description: Join a waiting game
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Game not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Join a game as black player
+      tags:
+      - game
+  /games/{id}/move:
+    post:
+      consumes:
+      - application/json
+      description: Submit a move in algebraic notation
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Move details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/chess-backend_internal_transport_dto.MoveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+        "400":
+          description: Invalid move
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Game not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Make a move in a game
+      tags:
+      - game
+  /games/{id}/moves:
+    get:
+      description: Retrieve the complete move history of a game
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/chess-backend_internal_transport_dto.MoveResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Game not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get move history for a game
+      tags:
+      - game
+  /games/waiting:
+    get:
+      description: Get all games waiting for a player
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/chess-backend_internal_transport_dto.GameResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: List waiting games
+      tags:
+      - game
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate and get JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/chess-backend_internal_transport_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chess-backend_internal_transport_dto.AuthResponse'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "401":
+          description: Invalid credentials
+          schema:
+            type: string
+      summary: Login user
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: Registration info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/chess-backend_internal_transport_dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chess-backend_internal_transport_dto.AuthResponse'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "409":
+          description: Email already registered
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - auth
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
