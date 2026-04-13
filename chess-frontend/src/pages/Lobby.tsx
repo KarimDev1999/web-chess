@@ -11,6 +11,8 @@ import {
 } from '../api/chessApi'
 import { GameStatus } from '../lib/game'
 import { ALL_CATEGORIES } from '../lib/game/timeControls'
+import * as S from './Lobby.styled'
+import { PrimaryButton, SecondaryButton } from '../styles/styled'
 
 const STATUS_COLORS: Record<GameStatus, string> = {
   [GameStatus.Waiting]: '#2e7d32',
@@ -126,160 +128,143 @@ export function Lobby() {
   const selectionLabel = `${selectedCat.icon} ${selectedPreset.label}`
 
   return (
-    <div className="lobby">
-      {/* Modal overlay */}
+    <S.LobbyWrapper>
       {showCreator && (
-        <div className="modal-overlay" onClick={handleOverlayClick}>
-          <div className="modal-content" ref={modalRef}>
-            <div className="modal-header">
+        <S.ModalOverlay onClick={handleOverlayClick}>
+          <S.ModalContent ref={modalRef}>
+            <S.ModalHeader>
               <h2>New Game</h2>
-              <button className="modal-close" onClick={() => setShowCreator(false)}>
-                ✕
-              </button>
-            </div>
+              <S.ModalClose onClick={() => setShowCreator(false)}>✕</S.ModalClose>
+            </S.ModalHeader>
 
-            {/* Current selection */}
-            <div className="creator-selection">{selectionLabel}</div>
+            <S.CreatorSelection>{selectionLabel}</S.CreatorSelection>
 
-            {/* Color picker */}
-            <div className="color-picker-row">
+            <S.ColorPickerRow>
               {COLOR_OPTIONS.map(opt => (
-                <button
+                <S.ColorPill
                   key={opt.value}
-                  className={`color-pill ${colorPref === opt.value ? 'active' : ''}`}
+                  $active={colorPref === opt.value}
                   onClick={() => setColorPref(opt.value)}
                 >
                   {opt.label}
-                </button>
+                </S.ColorPill>
               ))}
-            </div>
+            </S.ColorPickerRow>
 
-            {/* Time control sections */}
-            <div className="time-sections">
+            <S.TimeSections>
               {ALL_CATEGORIES.map((cat, catIdx) => {
                 const isOpen = openCategory === catIdx
                 const isCurrentCategory = catIdx === selectedCatIdx
                 return (
-                  <div key={cat.id} className="time-section">
-                    <button
-                      className="time-section-header"
-                      onClick={() => setOpenCategory(isOpen ? -1 : catIdx)}
-                    >
-                      <span className="time-section-label">
-                        <span className="section-icon">{cat.icon}</span>
+                  <S.TimeSection key={cat.id}>
+                    <S.TimeSectionHeader onClick={() => setOpenCategory(isOpen ? -1 : catIdx)}>
+                      <S.TimeSectionLabel>
+                        <span>{cat.icon}</span>
                         {cat.label}
-                      </span>
-                      <span className="chevron">{isOpen ? '▲' : '▼'}</span>
-                    </button>
+                      </S.TimeSectionLabel>
+                      <S.Chevron>{isOpen ? '▲' : '▼'}</S.Chevron>
+                    </S.TimeSectionHeader>
                     {isOpen && (
-                      <div className="time-section-pills">
+                      <S.TimeSectionPills>
                         {cat.presets.map((preset, presetIdx) => {
                           const isSelected = isCurrentCategory && presetIdx === selectedPresetIdx
                           return (
-                            <button
+                            <S.TimePill
                               key={preset.label}
-                              className={`time-pill ${isSelected ? 'selected' : ''}`}
+                              $selected={isSelected}
                               onClick={() => handleSelectPreset(catIdx, presetIdx)}
                             >
                               {preset.label}
-                            </button>
+                            </S.TimePill>
                           )
                         })}
-                      </div>
+                      </S.TimeSectionPills>
                     )}
-                  </div>
+                  </S.TimeSection>
                 )
               })}
-            </div>
+            </S.TimeSections>
 
-            <button className="btn-primary btn-create-game" onClick={handleCreate}>
+            <PrimaryButton as={S.CreateButton} onClick={handleCreate}>
               Create Game
-            </button>
-          </div>
-        </div>
+            </PrimaryButton>
+          </S.ModalContent>
+        </S.ModalOverlay>
       )}
 
-      <div className="user-bar">
+      <S.UserBar>
         <h1>Lobby</h1>
         <div>
-          <span className="user-greeting">Hello, {user?.username}</span>
-          <button className="btn-secondary" onClick={handleLogout}>
-            Logout
-          </button>
+          <S.UserGreeting>Hello, {user?.username}</S.UserGreeting>
+          <SecondaryButton onClick={handleLogout}>Logout</SecondaryButton>
         </div>
-      </div>
+      </S.UserBar>
 
-      <div className="actions">
-        <button className="btn-primary" onClick={() => setShowCreator(true)}>
-          + New Game
-        </button>
-        <button className="btn-secondary" onClick={loadGames}>
-          Refresh
-        </button>
-      </div>
+      <S.Actions>
+        <PrimaryButton onClick={() => setShowCreator(true)}>+ New Game</PrimaryButton>
+        <SecondaryButton onClick={loadGames}>Refresh</SecondaryButton>
+      </S.Actions>
 
-      {error && <div className="error-inline">{error}</div>}
+      {error && <S.ErrorInline>{error}</S.ErrorInline>}
 
       {loading ? (
         <p>Loading...</p>
       ) : (
         <>
-          <h2 className="section-heading">Waiting Games</h2>
+          <S.SectionHeading>Waiting Games</S.SectionHeading>
           {waitingGames.length === 0 ? (
-            <div className="empty-state section-gap">
+            <S.EmptyState>
               <p>No games waiting. Create one to get started!</p>
-            </div>
+            </S.EmptyState>
           ) : (
-            <div className="game-list section-gap">
+            <S.GameList>
               {waitingGames.map(g => (
-                <div key={g.id} className="game-card">
-                  <div className="info">
+                <S.GameCard key={g.id}>
+                  <S.GameInfo>
                     <span>
                       Host: <strong>{g.white_player.username}</strong>
                     </span>
                     {g.time_control.base > 0 && (
-                      <span className="time-badge">
+                      <S.TimeBadge>
                         {g.time_control.base / 60}+{g.time_control.increment}
-                      </span>
+                      </S.TimeBadge>
                     )}
                     <span>
                       Created: <strong>{new Date(g.created_at).toLocaleTimeString()}</strong>
                     </span>
-                  </div>
-                  <button className="btn-primary" onClick={() => handleJoin(g.id)}>
-                    Join
-                  </button>
-                </div>
+                  </S.GameInfo>
+                  <PrimaryButton onClick={() => handleJoin(g.id)}>Join</PrimaryButton>
+                </S.GameCard>
               ))}
-            </div>
+            </S.GameList>
           )}
 
-          <h2 className="section-heading">My Games</h2>
+          <S.SectionHeading>My Games</S.SectionHeading>
           {myGames.length === 0 ? (
-            <p className="text-muted">You have no games yet.</p>
+            <S.TextMuted>You have no games yet.</S.TextMuted>
           ) : (
-            <div className="game-list">
+            <S.GameList>
               {myGames.map(g => (
-                <div key={g.id} className="game-card">
-                  <div className="info">
-                    <span className="status-badge" style={{ background: STATUS_COLORS[g.status] }}>
+                <S.GameCard key={g.id}>
+                  <S.GameInfo>
+                    <S.StatusBadge style={{ background: STATUS_COLORS[g.status] }}>
                       {STATUS_LABELS[g.status]}
-                    </span>
+                    </S.StatusBadge>
                     {g.time_control.base > 0 && (
-                      <span className="time-badge">
+                      <S.TimeBadge>
                         {g.time_control.base / 60}+{g.time_control.increment}
-                      </span>
+                      </S.TimeBadge>
                     )}
-                  </div>
-                  <button className="btn-secondary" onClick={() => navigate(`/game/${g.id}`)}>
+                  </S.GameInfo>
+                  <SecondaryButton onClick={() => navigate(`/game/${g.id}`)}>
                     {gameButtonLabel(g.status)}
-                  </button>
-                </div>
+                  </SecondaryButton>
+                </S.GameCard>
               ))}
-            </div>
+            </S.GameList>
           )}
         </>
       )}
-    </div>
+    </S.LobbyWrapper>
   )
 }

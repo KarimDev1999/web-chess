@@ -23,6 +23,8 @@ import {
 } from '../lib/game'
 import { Color } from '../lib/chess'
 import { SERVER_EVENT, CLIENT_TYPE, KEY, type ServerMessage } from '../lib/wsMessages'
+import * as S from './GameView.styled'
+import { PrimaryButton, SecondaryButton, DangerButton } from '../styles/styled'
 
 const STATUS_LABEL_YOUR_TURN = 'Your turn'
 const STATUS_LABEL_OPPONENT_TURN = "Opponent's turn"
@@ -242,11 +244,9 @@ export function GameView() {
       if (!game.time_control || game.time_control.base === 0) return false
       const stored = color === Color.White ? game.white_remaining : game.black_remaining
       if (stored == null) return false
-      if (color === game.turn && game.last_move_at) {
-        const elapsed = Date.now() - new Date(game.last_move_at).getTime()
-        return stored - elapsed <= 0
-      }
-      return false
+      if (!game.last_move_at) return false
+      const elapsed = Date.now() - new Date(game.last_move_at).getTime()
+      return stored - elapsed <= 0
     }
     if (hasTimedOut(Color.White) || hasTimedOut(Color.Black)) {
       timeoutTriggered.current = true
@@ -256,20 +256,18 @@ export function GameView() {
 
   if (loading)
     return (
-      <div className="lobby">
+      <S.GameViewWrapper>
         <p>Loading game...</p>
-      </div>
+      </S.GameViewWrapper>
     )
   if (!game)
     return (
-      <div className="lobby">
+      <S.GameViewWrapper>
         <p>
           Game not found.{' '}
-          <button className="btn-primary" onClick={() => navigate('/lobby')}>
-            Back to Lobby
-          </button>
+          <PrimaryButton onClick={() => navigate('/lobby')}>Back to Lobby</PrimaryButton>
         </p>
-      </div>
+      </S.GameViewWrapper>
     )
 
   const currentUserId = getAuth().user?.id
@@ -352,25 +350,20 @@ export function GameView() {
   const opponentHasOffered = drawOfferFromOpponent !== null
 
   return (
-    <div className="game-view">
-      <div className="game-content">
-        <div className="board-column">
-          <div className="game-header-bar">
-            <button className="btn-secondary" onClick={() => navigate('/lobby')}>
-              ← Lobby
-            </button>
-            <span className={`game-status ${game.status}`}>{statusLabel()}</span>
-            <span
-              className="ws-indicator"
-              title={`WebSocket ${connected ? 'connected' : 'disconnected'}`}
-            >
+    <S.GameViewWrapper>
+      <S.GameContent>
+        <S.BoardColumn>
+          <S.GameHeaderBar>
+            <SecondaryButton onClick={() => navigate('/lobby')}>← Lobby</SecondaryButton>
+            <S.GameStatus $status={game.status}>{statusLabel()}</S.GameStatus>
+            <S.WsIndicator title={`WebSocket ${connected ? 'connected' : 'disconnected'}`}>
               {connected ? '●' : '○'}
-            </span>
-          </div>
+            </S.WsIndicator>
+          </S.GameHeaderBar>
 
-          {errorMsg && <div className="error-banner">{errorMsg}</div>}
+          {errorMsg && <S.ErrorBanner>{errorMsg}</S.ErrorBanner>}
 
-          <div className="board-container">
+          <S.BoardContainer>
             {topPlayer && (
               <PlayerProfile
                 key={`top-${topPlayer.id}`}
@@ -400,18 +393,18 @@ export function GameView() {
                 clock={formatClock(getLiveRemaining(bottomColor))}
               />
             )}
-          </div>
-        </div>
+          </S.BoardContainer>
+        </S.BoardColumn>
 
-        <div className="game-sidebar">
-          <div className="move-history">
+        <S.GameSidebar>
+          <S.MoveHistory>
             <h3>Moves ({moves.length})</h3>
             {moves.length === 0 ? (
-              <p className="no-moves">No moves yet</p>
+              <S.NoMoves>No moves yet</S.NoMoves>
             ) : (
-              <div className="moves-list">
+              <S.MovesList>
                 {movePairs.map(({ num, white, black }) => (
-                  <div key={num} className="move-row">
+                  <S.MoveRow key={num}>
                     <span className="move-num">{num}.</span>
                     <span className="move">
                       {white ? formatMove(white.from, white.to, white.promotion) : ''}
@@ -419,60 +412,50 @@ export function GameView() {
                     <span className="move">
                       {black ? formatMove(black.from, black.to, black.promotion) : ''}
                     </span>
-                  </div>
+                  </S.MoveRow>
                 ))}
-              </div>
+              </S.MovesList>
             )}
-          </div>
+          </S.MoveHistory>
 
           {game.status === GameStatus.Waiting && !game.black_player && (
-            <div className="waiting-notice">
+            <S.WaitingNotice>
               <p>Waiting for opponent to join...</p>
-            </div>
+            </S.WaitingNotice>
           )}
 
           {game.status === GameStatus.Finished && (
-            <div className="game-over-notice">
+            <S.GameOverNotice>
               <p>{statusLabel()}</p>
-            </div>
+            </S.GameOverNotice>
           )}
 
           {opponentHasOffered && isGameActive && (
-            <div className="draw-offer-inline">
+            <S.DrawOfferInline>
               <p className="draw-offer-text">
                 Opponent offers a draw
                 {drawOfferCountdown !== null && (
                   <span className="draw-offer-timer"> ({drawOfferCountdown}s)</span>
                 )}
               </p>
-              <div className="draw-offer-buttons">
-                <button className="btn-primary" onClick={handleAcceptDraw}>
-                  Accept
-                </button>
-                <button className="btn-secondary" onClick={handleDeclineDraw}>
-                  Decline
-                </button>
-              </div>
-            </div>
+              <S.DrawOfferButtons>
+                <PrimaryButton onClick={handleAcceptDraw}>Accept</PrimaryButton>
+                <SecondaryButton onClick={handleDeclineDraw}>Decline</SecondaryButton>
+              </S.DrawOfferButtons>
+            </S.DrawOfferInline>
           )}
 
           {isGameActive && isPlayerInGame && (
-            <div className="game-actions">
+            <S.GameActions>
               {!userHasPendingOffer && (
-                <button className="btn-secondary" onClick={handleOfferDraw}>
-                  Offer Draw
-                </button>
+                <SecondaryButton onClick={handleOfferDraw}>Offer Draw</SecondaryButton>
               )}
-              {userHasPendingOffer && (
-                <span className="draw-pending-label">Draw offer pending...</span>
-              )}
-              <button className="btn-danger" onClick={handleResign}>
-                Resign
-              </button>
-            </div>
+              {userHasPendingOffer && <S.DrawPendingLabel>Draw offer pending...</S.DrawPendingLabel>}
+              <DangerButton onClick={handleResign}>Resign</DangerButton>
+            </S.GameActions>
           )}
-        </div>
-      </div>
-    </div>
+        </S.GameSidebar>
+      </S.GameContent>
+    </S.GameViewWrapper>
   )
 }

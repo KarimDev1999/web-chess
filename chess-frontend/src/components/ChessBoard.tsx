@@ -11,6 +11,7 @@ import {
 } from '../lib/chess'
 import { PieceType, Color } from '../lib/chess'
 import { PieceSVG } from './ChessPieces'
+import * as S from './ChessBoard.styled'
 import { DRAG_THRESHOLD_PX, DRAG_OVERLAY_SIZE } from '../lib/config/drag'
 import { GameStatus } from '../lib/game'
 
@@ -90,7 +91,7 @@ export function ChessBoard({ fen, turn, status, onMove, flipped = false }: Chess
 
   const resolveSquare = useCallback(
     (clientX: number, clientY: number): Pos | null => {
-      const el = document.querySelector('.board') as HTMLElement | null
+      const el = document.querySelector('[data-board]') as HTMLElement | null
       if (!el) return null
       const rect = el.getBoundingClientRect()
       const size = rect.width / BOARD_SIZE
@@ -196,7 +197,7 @@ export function ChessBoard({ fen, turn, status, onMove, flipped = false }: Chess
 
   return (
     <>
-      <div className="board" style={{ touchAction: 'none' }}>
+      <S.Board data-board>
         {rows.map(ri =>
           cols.map(ci => {
             const piece = board[ri][ci]
@@ -206,31 +207,33 @@ export function ChessBoard({ fen, turn, status, onMove, flipped = false }: Chess
             const dragOv = showDragOverlay && dragOver?.row === ri && dragOver?.col === ci
             const inCheckSquare = inCheck && kingPos?.row === ri && kingPos?.col === ci
 
+            const SquareComponent = inCheckSquare ? S.KingCheckSquare : S.Square
+
             return (
-              <div
+              <SquareComponent
                 key={`${ri}-${ci}`}
-                className={`square ${light ? 'light' : 'dark'}${sel ? ' selected' : ''}${isMoveTarget(ri, ci) && !isCaptureTarget(ri, ci) ? ' valid-move' : ''}${isCaptureTarget(ri, ci) ? ' capture-move' : ''}${dragSrc ? ' drag-source' : ''}${dragOv ? ' drag-over' : ''}${inCheckSquare ? ' king-check' : ''}`}
+                $isLight={light}
+                $selected={sel}
+                $lastMove={isMoveTarget(ri, ci) && !isCaptureTarget(ri, ci)}
+                $dragSource={dragSrc}
+                $dragOver={dragOv}
+                $kingCheck={inCheckSquare}
                 onClick={() => onSquareClick(ri, ci)}
                 onPointerDown={ev => onPointerDown(ev, ri, ci)}
               >
                 {piece && <PieceSVG type={piece.type} color={piece.color} />}
-                {isMoveTarget(ri, ci) && !isCaptureTarget(ri, ci) && (
-                  <span className="move-indicator" />
-                )}
-                {isCaptureTarget(ri, ci) && <span className="capture-indicator" />}
-              </div>
+                {isMoveTarget(ri, ci) && !isCaptureTarget(ri, ci) && <S.MoveIndicator />}
+                {isCaptureTarget(ri, ci) && <S.CaptureIndicator />}
+              </SquareComponent>
             )
           }),
         )}
-      </div>
+      </S.Board>
 
       {showDragOverlay && drag && (
-        <div
-          className="dragged-piece"
-          style={{ left: drag.x - DRAG_OVERLAY_SIZE / 2, top: drag.y - DRAG_OVERLAY_SIZE / 2 }}
-        >
+        <S.DraggedPiece style={{ left: drag.x - DRAG_OVERLAY_SIZE / 2, top: drag.y - DRAG_OVERLAY_SIZE / 2 }}>
           <PieceSVG type={drag.pieceType} color={drag.pieceColor} />
-        </div>
+        </S.DraggedPiece>
       )}
     </>
   )

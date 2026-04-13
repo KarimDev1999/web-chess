@@ -1,3 +1,6 @@
+import * as S from './PlayerProfile.styled'
+import { colors } from '../styles/styled'
+
 interface PlayerProfileProps {
   username: string
   color: 'white' | 'black'
@@ -31,34 +34,27 @@ export function PlayerProfile({
   clock,
 }: PlayerProfileProps) {
   const initial = username.charAt(0).toUpperCase()
-  const bgColor = color === 'white' ? '#f0d9b5' : '#b58863'
-  const textColor = color === 'white' ? '#1a1a2e' : '#e0e0e0'
+  const bgColor = color === 'white' ? colors.boardLight : colors.boardDark
+  const textColor = color === 'white' ? '#1a1a2e' : colors.text
 
   return (
-    <div className={`player-profile player-${color} ${isActive ? 'active' : ''}`}>
-      <div className="player-info-row">
-        <div className="player-avatar" style={{ background: bgColor, color: textColor }}>
-          {initial}
-        </div>
-        <div className="player-details">
-          <span className="player-name">{username}</span>
-          <span className="player-color-label">{color === 'white' ? 'White' : 'Black'}</span>
-        </div>
-        {clock && <span className={`player-clock ${isActive ? 'ticking' : ''}`}>{clock}</span>}
-        <span
-          className={`presence-dot ${isPresent ? 'online' : 'offline'}`}
-          title={isPresent ? 'Online' : 'Offline'}
-        />
-      </div>
+    <S.ProfileWrapper $isActive={isActive} $color={color}>
+      <S.InfoRow>
+        <S.Avatar $bg={bgColor} $text={textColor}>{initial}</S.Avatar>
+        <S.Details>
+          <S.Name>{username}</S.Name>
+          <S.ColorLabel>{color === 'white' ? 'White' : 'Black'}</S.ColorLabel>
+        </S.Details>
+        {clock && <S.Clock $ticking={isActive}>{clock}</S.Clock>}
+        <S.PresenceDot $online={isPresent} title={isPresent ? 'Online' : 'Offline'} />
+      </S.InfoRow>
       {capturedPieces.length > 0 && (
-        <div className="captured-pieces">
+        <S.CapturedPieces>
           {capturedPieces.map((p, i) => (
-            <span key={i} className="captured-piece">
-              {pieceSymbols[p] || p}
-            </span>
+            <S.CapturedPiece key={i}>{pieceSymbols[p] || p}</S.CapturedPiece>
           ))}
-        </div>
+        </S.CapturedPieces>
       )}
-    </div>
+    </S.ProfileWrapper>
   )
 }

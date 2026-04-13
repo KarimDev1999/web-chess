@@ -2,6 +2,8 @@ import { useState, FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { login } from '../api/chessApi'
 import { setAuth } from '../store/authStore'
+import * as S from './Login.styled'
+import { PrimaryButton, TextInput } from '../styles/styled'
 
 export function Login() {
   const [email, setEmail] = useState('')
@@ -26,32 +28,28 @@ export function Login() {
   }
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <S.Container>
+      <S.Card>
         <h1>Web Chess</h1>
-        <form onSubmit={handleSubmit}>
-          {error && <div className="error">{error}</div>}
-          <div className="form-group">
+        <S.Subtitle>Sign in to your account</S.Subtitle>
+        <S.Form onSubmit={handleSubmit}>
+          {error && <S.ErrorText>{error}</S.ErrorText>}
+          <S.FormGroup>
             <label>Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-          </div>
-          <div className="form-group">
+            <TextInput type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+          </S.FormGroup>
+          <S.FormGroup>
             <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button className="btn-primary" type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-        <p className="link-text">
-          Don't have an account? <Link to="/register">Register</Link>
-        </p>
-      </div>
-    </div>
+            <TextInput type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+          </S.FormGroup>
+          <PrimaryButton as={S.SubmitButton} type="submit" disabled={loading}>
+            {loading ? 'Logging in...' : 'Sign In'}
+          </PrimaryButton>
+        </S.Form>
+        <S.LinkText>
+          Don&apos;t have an account? <Link to="/register">Create one</Link>
+        </S.LinkText>
+      </S.Card>
+    </S.Container>
   )
 }

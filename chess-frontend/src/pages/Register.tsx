@@ -2,6 +2,8 @@ import { useState, FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { register } from '../api/chessApi'
 import { setAuth } from '../store/authStore'
+import * as S from './Login.styled'
+import { PrimaryButton, TextInput } from '../styles/styled'
 
 export function Register() {
   const [email, setEmail] = useState('')
@@ -27,36 +29,32 @@ export function Register() {
   }
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <S.Container>
+      <S.Card>
         <h1>Create Account</h1>
-        <form onSubmit={handleSubmit}>
-          {error && <div className="error">{error}</div>}
-          <div className="form-group">
+        <S.Subtitle>Join the chess community</S.Subtitle>
+        <S.Form onSubmit={handleSubmit}>
+          {error && <S.ErrorText>{error}</S.ErrorText>}
+          <S.FormGroup>
             <label>Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-          </div>
-          <div className="form-group">
+            <TextInput type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+          </S.FormGroup>
+          <S.FormGroup>
             <label>Username</label>
-            <input value={username} onChange={e => setUsername(e.target.value)} required />
-          </div>
-          <div className="form-group">
+            <TextInput value={username} onChange={e => setUsername(e.target.value)} required />
+          </S.FormGroup>
+          <S.FormGroup>
             <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button className="btn-primary" type="submit" disabled={loading}>
-            {loading ? 'Creating account...' : 'Register'}
-          </button>
-        </form>
-        <p className="link-text">
-          Already have an account? <Link to="/login">Login</Link>
-        </p>
-      </div>
-    </div>
+            <TextInput type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+          </S.FormGroup>
+          <PrimaryButton as={S.SubmitButton} type="submit" disabled={loading}>
+            {loading ? 'Creating account...' : 'Sign Up'}
+          </PrimaryButton>
+        </S.Form>
+        <S.LinkText>
+          Already have an account? <Link to="/login">Sign in</Link>
+        </S.LinkText>
+      </S.Card>
+    </S.Container>
   )
 }
