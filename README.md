@@ -2,6 +2,9 @@
 
 A real-time multiplayer chess application with WebSocket support, built with Go and React.
 
+<img width="1161" height="946" alt="image" src="https://github.com/user-attachments/assets/52e31c94-6d3d-40aa-9a25-f4865064b944" />
+
+
 ## Features
 
 - Real-time two-player chess with WebSocket communication
@@ -16,7 +19,7 @@ A real-time multiplayer chess application with WebSocket support, built with Go 
 ## Architecture
 
 ```
-chess-backend/          # Go backend (Clean Architecture)
+chess-backend/          # Go backend
 ├── cmd/api/            # Application entry point
 ├── internal/
 │   ├── app/            # Application layer (services, commands)
@@ -75,7 +78,6 @@ npm run lint         # Run ESLint
 ```bash
 cd chess-backend
 docker compose up -d
-go run cmd/api/main.go
 ```
 
 The server starts on `:8080` with Swagger docs at `/swagger/`.
@@ -113,7 +115,3 @@ Connect to `/ws?token=<jwt>` for real-time updates. Messages use a `type` field 
 - `game.draw_offered`, `game.draw_declined`, `game.draw_accepted` — Draw events
 - `game.resigned`, `game.timed_out` — Game end events
 - `presence` — Player presence updates
-
-## License
-
-MIT
