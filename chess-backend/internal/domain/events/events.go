@@ -23,8 +23,8 @@ func (e BaseEvent) OccurredAt() time.Time { return e.Timestamp }
 
 type GameCreated struct {
 	BaseEvent
-	GameID        string `json:"game_id"`
-	WhitePlayerID string `json:"white_player_id"`
+	GameID   string `json:"game_id"`
+	PlayerID string `json:"player_id"`
 }
 
 type GameJoined struct {

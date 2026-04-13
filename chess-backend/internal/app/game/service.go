@@ -39,8 +39,8 @@ func (s *GameService) CreateGame(ctx context.Context, cmd CreateGameCommand) (*c
 				Type:      events.EventGameCreated,
 				Timestamp: time.Now(),
 			},
-			GameID:        string(game.ID),
-			WhitePlayerID: cmd.PlayerID,
+			GameID:   string(game.ID),
+			PlayerID: cmd.PlayerID,
 		})
 	}()
 

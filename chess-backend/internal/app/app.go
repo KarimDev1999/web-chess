@@ -67,7 +67,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 		if err != nil {
 			return err
 		}
-		hub.NotifyPlayers([]string{e.WhitePlayerID}, data)
+		hub.NotifyPlayers([]string{e.PlayerID}, data)
 		return nil
 	})
 	eventBus.Subscribe(events.EventGameJoined, func(ctx context.Context, event events.DomainEvent) error {
